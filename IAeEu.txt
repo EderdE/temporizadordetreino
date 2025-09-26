@@ -1,0 +1,14 @@
+Criaremos um temporizador de treino Web que deve possuir as seguintes carecterísticas:
+A tela inicial terá o logo no topo.
+O Campo treino estará abaixo com as configurações de minutos e segundos, iniciando no padrão 1 minuto.
+O campo descanso estará ao lado com as configurações de mimutos e segundos, iniciando no padrão 30 segundos.
+Abaixo um botão para repetir com um numero de vezes que se deseje fazer o lupin dos contadores, inicando no padrão 3.
+Abaixo o botão de Start, ao lado deste, o botão de pausar e ao lado o botão de parar.
+Abaixo dos botões os tempos em destaque do Treino e do descanso que estarão em execução.
+O layout da aplicação deve ser reponsivo, se ajustando conforme o tamanho da tela no dispositivo.
+Ao acessar o site o mesmo deve aparecer em modo tela cheia.
+Uma observação de apertar o esc para sair do modo tela cheia deve ficar no rodapé.
+Abaixo dessa observação deve aparecer a frase: "Criado por Éderson dEthur em outubro de 2025."
+O código deve ser descrito em partes e comentado para uma facil organização.
+
+

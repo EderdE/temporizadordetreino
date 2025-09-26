@@ -1,0 +1,142 @@
+ /* Estilos gerais */
+ *,
+ *::before,
+ *::after {
+  box-sizing: border-box;
+ }
+
+ body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+ }
+
+ header, main, footer {
+  width: 100%;
+  text-align: center;
+  padding: 20px;
+ }
+
+ header img {
+  max-width: 90%; /* Garante que a imagem não ultrapasse a largura da tela */
+  height: auto;   /* Mantém a proporção da imagem ao redimensionar a largura */
+  max-height: 150px; /* Define uma altura máxima para não ficar grande demais em telas maiores */
+ }
+
+ /* Estilos para a seção de configurações */
+ #configuracoes {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+ }
+
+ #configuracoes div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #791308; /* Fundo vermelho */
+  color: white; /* Letras em branco */
+  padding: 12px 20px;
+  margin: 10px;
+  border-radius: 15px; /* Bordas mais arredondadas */
+  border: 1px solid #df1a0c; /* Borda um pouco mais escura */
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1), /* Sombra interna para efeito 3D */
+              1px 1px 3px rgba(255,255,255,0.8);
+  width: 275px; /* Largura aumentada em 10% */
+ }
+
+ #configuracoes input[type="number"] {
+  width: 50px; /* Tamanho para os campos de número */
+  text-align: center;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+ }
+
+ /* Estilos para os botões */
+ #botoes {
+  margin-bottom: 20px;
+ }
+
+ #botoes button {
+  padding: 11px 22px; /* Padding diminuído em ~10% */
+  margin: 0 10px;
+  cursor: pointer;
+  border-radius: 12px; /* Cantos mais arredondados */
+  border: 1px solid #333; /* Borda escura para profundidade */
+  background: linear-gradient(to bottom, #666, #444); /* Gradiente para efeito 3D */
+  color: white; /* Texto branco */
+  font-family: 'Arial Black', Gadget, sans-serif; /* Fonte mais cheia e de ação */
+  font-size: 1.0em; /* Fonte diminuída em 10% */
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Sombra no texto */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4); /* Sombra para "flutuar" */
+  transition: all 0.1s ease-in-out; /* Transição suave */
+ }
+
+ #botoes button:active {
+  /* Efeito de botão pressionado */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  transform: translateY(2px);
+ }
+
+ /* Estilos para os tempos em destaque */
+ #tempos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  background: linear-gradient(to bottom, #f0f0f0, #dcdcdc); /* Fundo em tom claro */
+  color: #f32112; /* Letras em laranja */
+  padding: 20px;
+  border-radius: 15px; /* Bordas mais arredondadas */
+  border: 1px solid #333; /* Borda escura para profundidade */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4); /* Sombra para "flutuar" */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Sombra no texto */
+  width: 290px; /* Largura afinada em 15% */
+  margin-left: auto; /* Centraliza o elemento */
+  margin-right: auto; /* Centraliza o elemento */
+  margin-bottom: 20px;
+ }
+
+ #tempos div {
+  font-size: 1.5em;
+  margin: 5px 0; /* Ajusta o espaçamento vertical entre os textos */
+  padding: 5px;
+
+ }
+
+ /* Estilos para o rodapé */
+ footer {
+  background-color: #f0f0f0;
+  padding: 10px;
+  font-size: 0.8em;
+ }
+
+ /* Responsividade */
+ @media (max-width: 600px) {
+  #configuracoes {
+  flex-direction: column;
+  }
+
+  #configuracoes div {
+  margin: 5px;
+  }
+
+  #botoes button {
+  padding: 7px 14px; /* Padding diminuído em ~10% */
+  margin: 5px;
+  }
+
+  #tempos div {
+  font-size: 1.2em;
+  padding: 2px;
+  }
+ }
