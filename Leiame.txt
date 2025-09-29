@@ -1,0 +1,7 @@
+Temporizador para treino.
+Configure o tempo de treino e o tempo de descanso.
+O botão Start inicia a contagem.
+O Pause pausa.
+O Stop retorna o marcador para a configuração configurada.
+Criado por Éderson d'Avila Ethur.
+Florianópolis, setembro de 2025.
