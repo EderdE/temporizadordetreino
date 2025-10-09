@@ -26,6 +26,7 @@
   max-width: 90%; /* Garante que a imagem não ultrapasse a largura da tela */
   height: auto;   /* Mantém a proporção da imagem ao redimensionar a largura */
   max-height: 150px; /* Define uma altura máxima para não ficar grande demais em telas maiores */
+  border-radius: 20px; /* Bordas arredondadas */
  }
 
  /* Estilos para a seção de configurações */
@@ -42,12 +43,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #791308; /* Fundo vermelho */
+  background-color: #813706; /* Fundo vermelho */
   color: white; /* Letras em branco */
   padding: 12px 20px;
   margin: 10px;
   border-radius: 15px; /* Bordas mais arredondadas */
-  border: 1px solid #df1a0c; /* Borda um pouco mais escura */
+  border: 1px solid #df590c; /* Borda um pouco mais escura */
   box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1), /* Sombra interna para efeito 3D */
               1px 1px 3px rgba(255,255,255,0.8);
   width: 275px; /* Largura aumentada em 10% */
@@ -94,12 +95,12 @@
   align-items: center;
   font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
   background: linear-gradient(to bottom, #f0f0f0, #dcdcdc); /* Fundo em tom claro */
-  color: #f32112; /* Letras em laranja */
+  color: #d66800; /* Letras em laranja */
   padding: 20px;
   border-radius: 15px; /* Bordas mais arredondadas */
   border: 1px solid #333; /* Borda escura para profundidade */
   box-shadow: 0 4px 6px rgba(0,0,0,0.4); /* Sombra para "flutuar" */
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Sombra no texto */
+  text-shadow: 1px 1px 2px rgba(77, 37, 0, 0.5); /* Sombra no texto */
   width: 290px; /* Largura afinada em 15% */
   margin-left: auto; /* Centraliza o elemento */
   margin-right: auto; /* Centraliza o elemento */

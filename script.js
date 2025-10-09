@@ -46,6 +46,7 @@
  let estado = 'parado'; // pode ser 'parado', 'rodando', 'pausado'
  let ciclo = 'treino';
  let debounceTimeout; // Variável para o temporizador do ajuste
+ let wakeLock = null; // Variável para o Screen Wake Lock
  // Áudios
  const somInicio = new Audio('umsino.mp3');
  const somFimPeriodo = new Audio('doissinos.mp3');
@@ -67,7 +68,28 @@
   tempoDescansoDisplay.textContent = 'Descanso/Pausa: ' + formatarTempo(parseInt(descansoMinutos.value), parseInt(descansoSegundos.value));
  }
 
- function iniciarTemporizador() {
+ // Função para solicitar o bloqueio de tela
+ const requestWakeLock = async () => {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      console.log('Screen Wake Lock ativado.');
+    }
+  } catch (err) {
+    console.error(`${err.name}, ${err.message}`);
+  }
+ };
+ 
+ // Função para liberar o bloqueio de tela
+ const releaseWakeLock = async () => {
+  if (wakeLock !== null) {
+    await wakeLock.release();
+    wakeLock = null;
+    console.log('Screen Wake Lock liberado.');
+  }
+ };
+
+ async function iniciarTemporizador() {
   // Se estiver parado, inicia um novo ciclo do zero
   if (estado === 'parado') {
     entrarTelaCheia(); // Entra em tela cheia ao iniciar
@@ -77,12 +99,14 @@
     treinoTempoRestante = parseInt(treinoMinutos.value) * 60 + parseInt(treinoSegundos.value);
     descansoTempoRestante = parseInt(descansoMinutos.value) * 60 + parseInt(descansoSegundos.value);
 
+    await requestWakeLock(); // Impede a tela de apagar
     somInicio.play(); // Toca o som de início
     // Inicia o loop do temporizador
     intervalo = setInterval(tick, 1000);
   } 
   // Se estiver pausado, apenas continua
   else if (estado === 'pausado') {
+    await requestWakeLock(); // Reativa o bloqueio ao continuar
     estado = 'rodando';
   }
  }
@@ -132,12 +156,14 @@
  function pausarTemporizador() {
   if (estado === 'rodando') {
     estado = 'pausado';
+    releaseWakeLock(); // Permite que a tela apague ao pausar
   }
  }
 
  function pararTemporizador() {
   estado = 'parado';
   clearInterval(intervalo);
+  releaseWakeLock(); // Libera o bloqueio ao parar
   atualizarDisplay();
  }
 
