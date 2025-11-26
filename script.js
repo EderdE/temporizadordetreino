@@ -36,12 +36,14 @@
  // Variáveis para os tempos exibidos
  let tempoTreinoDisplay = document.getElementById('tempo-treino');
  let tempoDescansoDisplay = document.getElementById('tempo-descanso');
+ let repeticoesDisplay = document.getElementById('tempo-repeticoes');
 
  // Variável para o número de repetições
  let repeticoesInput = document.getElementById('repeticoes');
  let repeticoes = parseInt(repeticoesInput.value);
 
  // Variáveis para controle do temporizador
+ let repeticoesRestantes;
  let intervalo;
  let estado = 'parado'; // pode ser 'parado', 'rodando', 'pausado'
  let ciclo = 'treino';
@@ -66,6 +68,7 @@
  function atualizarDisplay() {
   tempoTreinoDisplay.textContent = 'Tempo de Treino: ' + formatarTempo(parseInt(treinoMinutos.value), parseInt(treinoSegundos.value));
   tempoDescansoDisplay.textContent = 'Descanso/Pausa: ' + formatarTempo(parseInt(descansoMinutos.value), parseInt(descansoSegundos.value));
+  repeticoesDisplay.textContent = 'Repetições restantes: ' + repeticoesInput.value;
  }
 
  // Função para solicitar o bloqueio de tela
@@ -98,6 +101,7 @@
     ciclo = 'treino';
     treinoTempoRestante = parseInt(treinoMinutos.value) * 60 + parseInt(treinoSegundos.value);
     descansoTempoRestante = parseInt(descansoMinutos.value) * 60 + parseInt(descansoSegundos.value);
+    repeticoesDisplay.textContent = 'Repetições restantes: ' + repeticoesRestantes;
 
     await requestWakeLock(); // Impede a tela de apagar
     somInicio.play(); // Toca o som de início
@@ -138,6 +142,7 @@
             // Fim do descanso
             repeticoesRestantes--;
             if (repeticoesRestantes > 0) {
+                repeticoesDisplay.textContent = 'Repetições restantes: ' + repeticoesRestantes;
                 // Inicia nova repetição
                 somFimPeriodo.play(); // Toca o som de fim de período (fim do descanso)
                 ciclo = 'treino';
@@ -145,6 +150,7 @@
                 tempoTreinoDisplay.textContent = 'Tempo de Treino: ' + formatarTempo(parseInt(treinoMinutos.value), parseInt(treinoSegundos.value));
             } else {
                 // Fim de todas as repetições
+                repeticoesDisplay.textContent = 'Repetições restantes: 0';
                 somFimPeriodo.play(); // Toca o som no fim do programa
                 pararTemporizador();
                 // alert('Temporizador Concluído!'); // Removido para não sair da tela cheia
@@ -173,7 +179,7 @@
  stopButton.addEventListener('click', pararTemporizador);
 
  // Event listeners para os campos de tempo com debounce
- const inputsTempo = [treinoMinutos, treinoSegundos, descansoMinutos, descansoSegundos];
+ const inputsTempo = [treinoMinutos, treinoSegundos, descansoMinutos, descansoSegundos, repeticoesInput];
  inputsTempo.forEach(input => {
   input.addEventListener('input', () => {
     // Limpa o temporizador anterior se o usuário continuar digitando
