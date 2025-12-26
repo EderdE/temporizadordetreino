@@ -4,38 +4,59 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Temporizador de Treino</title>
+  <!-- Cor da barra de endereço no Chrome (Android) -->
+  <meta name="theme-color" content="#003366" id="theme-color-meta">
+  <!-- Link para o manifesto PWA -->
+  <link rel="manifest" href="manifest.json">
+  <!-- Ícone para dispositivos Apple -->
+  <link rel="apple-touch-icon" href="EDsoft_icon.png">
+  <!-- Ícone padrão (favicon) -->
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="EDsoft_icon.png" type="image/png">
  </head>
- <body>
+ <body class="hit-mode">
   <header>
-  <h1><img src="EDSoft.png" alt="Logo da EDSoft"></h1>
+    <span id="mode-fight" class="mode-option">Fight Mode</span>
+    <h1>CronoTreino</h1>
+    <span id="mode-hit" class="mode-option active">Hit Mode</span>
   </header>
 
   <main>
+    <!--Container de configurações do treino-->
   <section id="configuracoes">
-  <div>
-  <label for="treino-minutos">Tempo de Treino:</label>
-  <input type="number" id="treino-minutos" value="1" min="0">
-  <label for="treino-segundos">:</label>
-  <input type="number" id="treino-segundos" value="0" min="0" max="59">
-  </div>
-  <div>
-  <label for="descanso-minutos">Descanso/Pausa:</label>
-  <input type="number" id="descanso-minutos" value="0" min="0">
-  <label for="descanso-segundos">:</label>
-  <input type="number" id="descanso-segundos" value="30" min="0" max="59">
-  </div>
-  <div>
-  <label for="repeticoes">Numero de Repetições:</label>
-  <input type="number" id="repeticoes" value="3" min="1">
-  </div>
+    <div class="config-container">
+      <div class="config-item">
+        <label id="lbl-treino" for="treino-minutos">Tempo de Treino:</label>
+        <div>
+          <input type="number" id="treino-minutos" placeholder="insira os minutos de treino" value="1" min="0">
+          <span>:</span>
+          <input type="number" id="treino-segundos" placeholder="insira os segundos de treino" value="0" min="0" max="59">
+        </div>
+      </div>
+      <div class="config-item">
+        <label id="lbl-descanso" for="descanso-minutos">Descanso/Pausa:</label>
+        <div>
+          <input type="number" id="descanso-minutos" placeholder="insira os minutos de descanso" value="0" min="0">
+          <span>:</span>
+          <input type="number" id="descanso-segundos" placeholder="insira os segundos de descanso" value="30" min="0" max="59">
+        </div>
+      </div>
+      <div class="config-item">
+        <label id="lbl-repeticoes" for="repeticoes">Nº de Repetições:</label>
+        <input type="number" placeholder="insira o numero de repetições do treino" id="repeticoes" value="3" min="1">
+      </div>
+    </div>
   </section>
-
+  <!--Container de propaganda que aparecerá ao acionar o Play, Quando for executado o Stop o container a aparecer será o da configuração-->
+  <section id="propaganda">
+    <img src="propa/PropagandaED.jpg" alt="Propaganda EDSoft">
+  </section>
+  <!--Container dos botões e dos tempos-->
   <section id="botoes">
-  <button id="start">Start</button>
-  <button id="pause">Pause</button>
-  <button id="stop">Stop</button>
+  <button id="start" aria-label="Start">▶</button>
+  <button id="pause" aria-label="Pause">❚❚</button>
+  <button id="stop" aria-label="Stop">■</button>
+  <img src="EDsoft_icon.png" alt="Logo do CronoTreino" id="logo-botao">
   </section>
 
   <section id="tempos">
@@ -43,11 +64,12 @@
   <div id="tempo-descanso">Descanso/Pausa: 00:30</div>
   <div id="tempo-repeticoes">Repetições restantes: 3</div>
   </section>
+
+
   </main>
 
   <footer>
-    <p>Tecle ESC para sair do modo tela cheia</p>
-  <p>Criado por Éderson dEthur em outubro de 2025</p>
+  <p id="copyright">Criado por Éderson dEthur</p>
   </footer>
 
   <script src="script.js"></script>

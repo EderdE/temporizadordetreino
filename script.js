@@ -42,11 +42,38 @@
  let repeticoesInput = document.getElementById('repeticoes');
  let repeticoes = parseInt(repeticoesInput.value);
 
+ // Labels para alteração de texto (Modos)
+ const lblTreino = document.getElementById('lbl-treino');
+ const lblDescanso = document.getElementById('lbl-descanso');
+ const lblRepeticoes = document.getElementById('lbl-repeticoes');
+
+ // Elementos de Configuração e Propaganda
+ const configSection = document.getElementById('configuracoes');
+ const propagandaSection = document.getElementById('propaganda');
+ const propagandaImg = propagandaSection.querySelector('img'); // Referência para a imagem
+
+ // Lista de imagens para a propaganda (Adicione seus arquivos aqui)
+ const imagensPropaganda = [
+  'propa/PropagandaED.jpg',
+  'propa/LogoDDTA.jpg'
+  // Exemplo de como adicionar mais imagens:
+  // 'propa/SuaSegundaImagem.jpg',
+  // 'propa/SuaTerceiraImagem.jpg'
+ ];
+ let indicePropaganda = 0;
+ let intervaloPropaganda;
+
  // Variáveis para controle do temporizador
+ let treinoTempoRestante;
+ let descansoTempoRestante;
  let repeticoesRestantes;
  let intervalo;
  let estado = 'parado'; // pode ser 'parado', 'rodando', 'pausado'
  let ciclo = 'treino';
+ let modoAtual = 'hit'; // 'hit' ou 'fight'
+ const modeFight = document.getElementById('mode-fight');
+ const modeHit = document.getElementById('mode-hit');
+ const metaThemeColor = document.getElementById('theme-color-meta');
  let debounceTimeout; // Variável para o temporizador do ajuste
  let wakeLock = null; // Variável para o Screen Wake Lock
  // Áudios
@@ -65,10 +92,46 @@
   return min + ':' + seg;
  }
 
+ // Função para alternar modos
+ function setModo(modo) {
+  modoAtual = modo;
+  if (modo === 'fight') {
+    modeFight.classList.add('active');
+    modeHit.classList.remove('active');
+    
+    lblTreino.textContent = 'Round Time:';
+    lblDescanso.textContent = 'Intervalo:';
+    lblRepeticoes.textContent = 'Nº de Rounds:';
+
+    document.body.classList.remove('hit-mode');
+    document.body.classList.add('fight-mode');
+    metaThemeColor.setAttribute('content', '#8b0000'); // Vermelho escuro
+  } else {
+    modeHit.classList.add('active');
+    modeFight.classList.remove('active');
+    
+    lblTreino.textContent = 'Tempo de Treino:';
+    lblDescanso.textContent = 'Descanso/Pausa:';
+    lblRepeticoes.textContent = 'Nº de Repetições:';
+
+    document.body.classList.remove('fight-mode');
+    document.body.classList.add('hit-mode');
+    metaThemeColor.setAttribute('content', '#003366'); // Azul escuro
+  }
+  atualizarDisplay();
+ }
+
+ modeFight.addEventListener('click', () => setModo('fight'));
+ modeHit.addEventListener('click', () => setModo('hit'));
+
  function atualizarDisplay() {
-  tempoTreinoDisplay.textContent = 'Tempo de Treino: ' + formatarTempo(parseInt(treinoMinutos.value), parseInt(treinoSegundos.value));
-  tempoDescansoDisplay.textContent = 'Descanso/Pausa: ' + formatarTempo(parseInt(descansoMinutos.value), parseInt(descansoSegundos.value));
-  repeticoesDisplay.textContent = 'Repetições restantes: ' + repeticoesInput.value;
+  const textoTreino = modoAtual === 'fight' ? 'Round Time: ' : 'Tempo de Treino: ';
+  const textoDescanso = modoAtual === 'fight' ? 'Intervalo: ' : 'Descanso/Pausa: ';
+  const textoRepeticoes = modoAtual === 'fight' ? 'Rounds restantes: ' : 'Repetições restantes: ';
+
+  tempoTreinoDisplay.textContent = textoTreino + formatarTempo(parseInt(treinoMinutos.value), parseInt(treinoSegundos.value));
+  tempoDescansoDisplay.textContent = textoDescanso + formatarTempo(parseInt(descansoMinutos.value), parseInt(descansoSegundos.value));
+  repeticoesDisplay.textContent = textoRepeticoes + repeticoesInput.value;
  }
 
  // Função para solicitar o bloqueio de tela
@@ -95,18 +158,53 @@
  async function iniciarTemporizador() {
   // Se estiver parado, inicia um novo ciclo do zero
   if (estado === 'parado') {
+    // Troca Configuração por Propaganda com animação
+    configSection.style.display = 'none';
+    propagandaSection.style.display = 'block';
+    propagandaSection.classList.remove('animar-saida');
+    propagandaSection.classList.add('animar-entrada');
+
+    // Inicia a rotação das propagandas
+    indicePropaganda = 0;
+    propagandaImg.src = imagensPropaganda[indicePropaganda]; // Garante o início na primeira
+    propagandaImg.classList.remove('img-fade-out', 'img-slide-in'); // Limpa classes anteriores
+
+    intervaloPropaganda = setInterval(() => {
+      // 1. Efeito de saída (perde cor e some)
+      propagandaImg.classList.add('img-fade-out');
+
+      setTimeout(() => {
+        if (estado !== 'rodando') return; // Previne execução se parou
+        // 2. Troca a imagem
+        indicePropaganda++;
+        if (indicePropaganda >= imagensPropaganda.length) {
+          indicePropaganda = 0;
+        }
+        propagandaImg.src = imagensPropaganda[indicePropaganda];
+
+        // 3. Remove saída e adiciona entrada (desliza de cima)
+        propagandaImg.classList.remove('img-fade-out');
+        propagandaImg.classList.add('img-slide-in');
+
+        // 4. Limpa classe de entrada após animação
+        setTimeout(() => {
+          propagandaImg.classList.remove('img-slide-in');
+        }, 500);
+      }, 500); // Espera 500ms do fade out
+    }, 10000); // Troca a cada 10 segundos (10000ms)
+
     entrarTelaCheia(); // Entra em tela cheia ao iniciar
     estado = 'rodando';
     repeticoesRestantes = parseInt(repeticoesInput.value);
     ciclo = 'treino';
     treinoTempoRestante = parseInt(treinoMinutos.value) * 60 + parseInt(treinoSegundos.value);
     descansoTempoRestante = parseInt(descansoMinutos.value) * 60 + parseInt(descansoSegundos.value);
-    repeticoesDisplay.textContent = 'Repetições restantes: ' + repeticoesRestantes;
 
     await requestWakeLock(); // Impede a tela de apagar
     somInicio.play(); // Toca o som de início
     // Inicia o loop do temporizador
     intervalo = setInterval(tick, 1000);
+    tick(); // Chama o tick imediatamente para atualizar a UI sem delay de 1s
   } 
   // Se estiver pausado, apenas continua
   else if (estado === 'pausado') {
@@ -116,47 +214,47 @@
  }
  
  function tick() {
-    if (estado !== 'rodando') return;
+  if (estado !== 'rodando') return;
 
-    if (ciclo === 'treino') {
-        if (treinoTempoRestante > 0) {
-            treinoTempoRestante--;
-            let minutos = Math.floor(treinoTempoRestante / 60);
-            let segundos = treinoTempoRestante % 60;
-            tempoTreinoDisplay.textContent = 'Tempo de Treino: ' + formatarTempo(minutos, segundos);
-        } else {
-            // Fim do treino, inicia o descanso
-            ciclo = 'descanso';
-            // Reseta o tempo de descanso para o próximo ciclo
-            somFimPeriodo.play(); // Toca o som de fim de período
-            descansoTempoRestante = parseInt(descansoMinutos.value) * 60 + parseInt(descansoSegundos.value);
-            tempoDescansoDisplay.textContent = 'Descanso/Pausa: ' + formatarTempo(parseInt(descansoMinutos.value), parseInt(descansoSegundos.value));
-        }
-    } else { // ciclo === 'descanso'
-        if (descansoTempoRestante > 0) {
-            descansoTempoRestante--;
-            let minutos = Math.floor(descansoTempoRestante / 60);
-            let segundos = descansoTempoRestante % 60;
-            tempoDescansoDisplay.textContent = 'Descanso/Pausa: ' + formatarTempo(minutos, segundos);
-        } else {
-            // Fim do descanso
-            repeticoesRestantes--;
-            if (repeticoesRestantes > 0) {
-                repeticoesDisplay.textContent = 'Repetições restantes: ' + repeticoesRestantes;
-                // Inicia nova repetição
-                somFimPeriodo.play(); // Toca o som de fim de período (fim do descanso)
-                ciclo = 'treino';
-                treinoTempoRestante = parseInt(treinoMinutos.value) * 60 + parseInt(treinoSegundos.value);
-                tempoTreinoDisplay.textContent = 'Tempo de Treino: ' + formatarTempo(parseInt(treinoMinutos.value), parseInt(treinoSegundos.value));
-            } else {
-                // Fim de todas as repetições
-                repeticoesDisplay.textContent = 'Repetições restantes: 0';
-                somFimPeriodo.play(); // Toca o som no fim do programa
-                pararTemporizador();
-                // alert('Temporizador Concluído!'); // Removido para não sair da tela cheia
-            }
-        }
+  const textoTreino = modoAtual === 'fight' ? 'Round Time: ' : 'Tempo de Treino: ';
+  const textoDescanso = modoAtual === 'fight' ? 'Intervalo: ' : 'Descanso/Pausa: ';
+  const textoRepeticoes = modoAtual === 'fight' ? 'Rounds restantes: ' : 'Repetições restantes: ';
+
+  repeticoesDisplay.textContent = textoRepeticoes + repeticoesRestantes;
+
+  if (ciclo === 'treino') {
+    if (treinoTempoRestante > 0) {
+      let minutos = Math.floor(treinoTempoRestante / 60);
+      let segundos = treinoTempoRestante % 60;
+      tempoTreinoDisplay.textContent = textoTreino + formatarTempo(minutos, segundos);
+      treinoTempoRestante--;
+    } else {
+      somFimPeriodo.play();
+      ciclo = 'descanso';
+      // Reseta o display do tempo de treino para o próximo ciclo
+      tempoTreinoDisplay.textContent = textoTreino + formatarTempo(parseInt(treinoMinutos.value), parseInt(treinoSegundos.value));
     }
+  } else { // ciclo === 'descanso'
+    if (descansoTempoRestante > 0) {
+      let minutos = Math.floor(descansoTempoRestante / 60);
+      let segundos = descansoTempoRestante % 60;
+      tempoDescansoDisplay.textContent = textoDescanso + formatarTempo(minutos, segundos);
+      descansoTempoRestante--;
+    } else {
+      repeticoesRestantes--;
+      if (repeticoesRestantes > 0) {
+        somFimPeriodo.play();
+        ciclo = 'treino';
+        treinoTempoRestante = parseInt(treinoMinutos.value) * 60 + parseInt(treinoSegundos.value);
+        descansoTempoRestante = parseInt(descansoMinutos.value) * 60 + parseInt(descansoSegundos.value);
+        // Reseta o display do tempo de descanso para o próximo ciclo
+        tempoDescansoDisplay.textContent = textoDescanso + formatarTempo(parseInt(descansoMinutos.value), parseInt(descansoSegundos.value));
+      } else {
+        somFimPeriodo.play();
+        pararTemporizador();
+      }
+    }
+  }
  }
 
  function pausarTemporizador() {
@@ -169,7 +267,22 @@
  function pararTemporizador() {
   estado = 'parado';
   clearInterval(intervalo);
+  clearInterval(intervaloPropaganda); // Para a rotação das propagandas
+  propagandaImg.classList.remove('img-fade-out', 'img-slide-in'); // Limpa efeitos de imagem
   releaseWakeLock(); // Libera o bloqueio ao parar
+
+  // Animação de saída da propaganda
+  propagandaSection.classList.remove('animar-entrada');
+  propagandaSection.classList.add('animar-saida');
+
+  // Aguarda a animação terminar (500ms) para trocar os containers
+  setTimeout(() => {
+    if (estado === 'parado') { // Verifica se ainda está parado para evitar conflito se reiniciar rápido
+      propagandaSection.style.display = 'none';
+      configSection.style.display = 'block';
+    }
+  }, 500);
+
   atualizarDisplay();
  }
 
@@ -186,8 +299,8 @@
     clearTimeout(debounceTimeout);
     // Define um novo temporizador para atualizar o display após 2 segundos
     debounceTimeout = setTimeout(() => {
-      atualizarDisplay();
-    }, 5000); // 5000 milissegundos = 5 segundos
+      if (estado === 'parado') atualizarDisplay();
+    }, 500); // 500 milissegundos = 0.5 segundos
   });
  });
 
