@@ -1,7 +1,12 @@
 Temporizador para treino.
-Configure o tempo de treino e o tempo de descanso.
+
+Configure o tempo de treino, o tempo de descanso e quantos lopings desejar.
+
 O botão Start inicia a contagem.
 O Pause pausa.
-O Stop retorna o marcador para a configuração configurada.
+O Stop zera e retorna para a configuração do treino.
+
 Criado por Éderson d'Avila Ethur.
 Florianópolis, setembro de 2025.
+
+Ultima atualização em 06/01/2026
