@@ -55,7 +55,10 @@
  // Lista de imagens para a propaganda (Adicione seus arquivos aqui)
  const imagensPropaganda = [
   'propa/PropagandaED.jpg',
-  'propa/LogoDDTA.jpg'
+  'propa/LogoRS.jpeg',
+  'propa/logoalex.bmp',
+  'propa/LogoDDTA.jpg',
+  
   // Exemplo de como adicionar mais imagens:
   // 'propa/SuaSegundaImagem.jpg',
   // 'propa/SuaTerceiraImagem.jpg'
@@ -71,14 +74,31 @@
  let estado = 'parado'; // pode ser 'parado', 'rodando', 'pausado'
  let ciclo = 'treino';
  let modoAtual = 'hit'; // 'hit' ou 'fight'
+ let tempoTotalTreinoInicial;
  const modeFight = document.getElementById('mode-fight');
  const modeHit = document.getElementById('mode-hit');
  const metaThemeColor = document.getElementById('theme-color-meta');
  let debounceTimeout; // Variável para o temporizador do ajuste
  let wakeLock = null; // Variável para o Screen Wake Lock
+ 
  // Áudios
- const somInicio = new Audio('umsino.mp3');
- const somFimPeriodo = new Audio('doissinos.mp3');
+ // Sons Globais
+ const somInicioGlobal = new Audio('som/vai.mp4'); // Som único de início do processo
+ const somFimGlobal = new Audio('som/doissinos.mp3'); // Som do fim do processo
+ 
+ // Sons para o Fight Mode
+ const somInicioTreinoFight = new Audio('som/sinoboxe.mp3');
+ const somFimTreinoFight = new Audio('som/doissinos.mp3');
+ const somInicioDescansoFight = new Audio('som/whoosh.mp3');
+ const somFimDescansoFight = new Audio('som/pop.mp3');
+ const somAlertaFight = new Audio('som/3batidasmadeira.mp4');
+
+ // Sons para o Hit Mode
+ const somInicioTreinoHit = new Audio('som/comecar.mp4');
+ const somFimTreinoHit = new Audio('som/1sinobike.mp4');
+ const somInicioDescansoHit = new Audio('som/respira2x.mp4');
+ const somFimDescansoHit = new Audio('som/whoosh.mp3');
+ const somAlertaHit = new Audio('som/regressiva10.mp4'); 
 
  // Botões
  const startButton = document.getElementById('start');
@@ -199,12 +219,18 @@
     ciclo = 'treino';
     treinoTempoRestante = parseInt(treinoMinutos.value) * 60 + parseInt(treinoSegundos.value);
     descansoTempoRestante = parseInt(descansoMinutos.value) * 60 + parseInt(descansoSegundos.value);
+    tempoTotalTreinoInicial = treinoTempoRestante;
 
     await requestWakeLock(); // Impede a tela de apagar
-    somInicio.play(); // Toca o som de início
-    // Inicia o loop do temporizador
-    intervalo = setInterval(tick, 1000);
-    tick(); // Chama o tick imediatamente para atualizar a UI sem delay de 1s
+    somInicioGlobal.play(); // Toca o som único de início
+    somInicioGlobal.onended = function() {
+      if (estado === 'rodando') {
+        if (modoAtual === 'fight') somInicioTreinoFight.play(); else somInicioTreinoHit.play();
+        // Inicia o loop do temporizador apenas após o som global terminar
+        intervalo = setInterval(tick, 1000);
+        tick(); // Chama o tick imediatamente para atualizar a UI sem delay de 1s
+      }
+    };
   } 
   // Se estiver pausado, apenas continua
   else if (estado === 'pausado') {
@@ -227,12 +253,37 @@
       let minutos = Math.floor(treinoTempoRestante / 60);
       let segundos = treinoTempoRestante % 60;
       tempoTreinoDisplay.textContent = textoTreino + formatarTempo(minutos, segundos);
+      
+      // Condição para o som de alerta
+      if (treinoTempoRestante === 11 && tempoTotalTreinoInicial > 15) {
+        if (modoAtual === 'fight') {
+          somAlertaFight.play().catch(e => console.log('Erro ao tocar som de alerta:', e));
+        } else { // modoAtual === 'hit'
+          somAlertaHit.play().catch(e => console.log('Erro ao tocar som de alerta:', e));
+        }
+      }
       treinoTempoRestante--;
     } else {
-      somFimPeriodo.play();
-      ciclo = 'descanso';
-      // Reseta o display do tempo de treino para o próximo ciclo
-      tempoTreinoDisplay.textContent = textoTreino + formatarTempo(parseInt(treinoMinutos.value), parseInt(treinoSegundos.value));
+      if (modoAtual === 'fight') {
+        somFimTreinoFight.play();
+      } else {
+        somFimTreinoHit.play();
+      }
+
+      if (repeticoesRestantes === 1) {
+        repeticoesRestantes--;
+        repeticoesDisplay.textContent = textoRepeticoes + repeticoesRestantes;
+        
+        // Toca o som final global
+        somFimGlobal.play();
+
+        pararTemporizador();
+      } else {
+        if (modoAtual !== 'fight') somInicioDescansoHit.play();
+        ciclo = 'descanso';
+        // Reseta o display do tempo de treino para o próximo ciclo
+        tempoTreinoDisplay.textContent = textoTreino + formatarTempo(parseInt(treinoMinutos.value), parseInt(treinoSegundos.value));
+      }
     }
   } else { // ciclo === 'descanso'
     if (descansoTempoRestante > 0) {
@@ -241,16 +292,22 @@
       tempoDescansoDisplay.textContent = textoDescanso + formatarTempo(minutos, segundos);
       descansoTempoRestante--;
     } else {
+      if (modoAtual !== 'fight') somFimDescansoHit.play();
       repeticoesRestantes--;
       if (repeticoesRestantes > 0) {
-        somFimPeriodo.play();
+        if (modoAtual === 'fight') {
+          somInicioTreinoFight.play();
+        } else {
+          somInicioTreinoHit.play();
+        }
         ciclo = 'treino';
         treinoTempoRestante = parseInt(treinoMinutos.value) * 60 + parseInt(treinoSegundos.value);
         descansoTempoRestante = parseInt(descansoMinutos.value) * 60 + parseInt(descansoSegundos.value);
         // Reseta o display do tempo de descanso para o próximo ciclo
         tempoDescansoDisplay.textContent = textoDescanso + formatarTempo(parseInt(descansoMinutos.value), parseInt(descansoSegundos.value));
       } else {
-        somFimPeriodo.play();
+        // Caso de segurança para fim do processo (embora geralmente acabe no treino)
+        somFimGlobal1.play();
         pararTemporizador();
       }
     }
