@@ -5,20 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Temporizador de Treino</title>
   <!-- Cor da barra de endereço no Chrome (Android) -->
-  <meta name="theme-color" content="#003366" id="theme-color-meta">
+  <meta name="theme-color" content="#8b0000" id="theme-color-meta"> <!-- Cor para Fight Mode -->
   <!-- Link para o manifesto PWA -->
   <link rel="manifest" href="manifest.json">
   <!-- Ícone para dispositivos Apple -->
   <link rel="apple-touch-icon" href="EDsoft_icon.png">
   <!-- Ícone padrão (favicon) -->
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="EDsoft_icon.png" type="image/png">
+  <link rel="icon" href="EDsoft_icon.png" type="image/png"> 
  </head>
- <body class="hit-mode">
+ <body class="fight-mode"> <!-- Alterado para iniciar em fight-mode -->
   <header>
-    <span id="mode-fight" class="mode-option">Fight Mode</span>
+    <span id="mode-fight" class="mode-option active">Fight Mode</span> <!-- Ativo por padrão -->
     <h1>CronoTreino</h1>
-    <span id="mode-hit" class="mode-option active">Hit Mode</span>
+    <span id="mode-hit" class="mode-option">Hit Mode</span>
   </header>
 
   <main>
@@ -56,7 +56,7 @@
   <button id="start" aria-label="Start">▶</button>
   <button id="pause" aria-label="Pause">❚❚</button>
   <button id="stop" aria-label="Stop">■</button>
-  <img src="EDsoft_icon.png" alt="Logo do CronoTreino" id="logo-botao">
+  <img src="propa/PropagandaED.png" alt="Logo do CronoTreino" id="logo-botao">
   </section>
 
   <section id="tempos">

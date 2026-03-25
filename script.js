@@ -54,10 +54,12 @@
 
  // Lista de imagens para a propaganda (Adicione seus arquivos aqui)
  const imagensPropaganda = [
-  'propa/PropagandaED.jpg',
+  'propa/ED.png',
+  'propa/PropagandaED.png',
   'propa/LogoRS.jpeg',
   'propa/logoalex.bmp',
   'propa/LogoDDTA.jpg',
+  'propa/Mensagens.png',
   
   // Exemplo de como adicionar mais imagens:
   // 'propa/SuaSegundaImagem.jpg',
@@ -72,8 +74,8 @@
  let repeticoesRestantes;
  let intervalo;
  let estado = 'parado'; // pode ser 'parado', 'rodando', 'pausado'
- let ciclo = 'treino';
- let modoAtual = 'hit'; // 'hit' ou 'fight'
+ let ciclo = 'treino'; // O ciclo inicial sempre será 'treino'
+ let modoAtual = 'fight'; // 'hit' ou 'fight' - Alterado para iniciar em 'fight'
  let tempoTotalTreinoInicial;
  const modeFight = document.getElementById('mode-fight');
  const modeHit = document.getElementById('mode-hit');
@@ -110,6 +112,24 @@
   const min = minutos < 10 ? '0' + minutos : minutos;
   const seg = segundos < 10 ? '0' + segundos : segundos;
   return min + ':' + seg;
+ }
+
+ // Função para reproduzir áudio de forma segura
+ // Garante que o áudio comece do início e lida com possíveis erros de reprodução.
+ // Não controla diretamente o áudio de outros aplicativos, mas melhora a robustez do nosso áudio.
+ function playSafe(audioElement, volume = 0.75) {
+  if (!audioElement) {
+    console.warn('Attempted to play a null or undefined audio element.');
+    return Promise.reject(new Error('Audio element is null or undefined.'));
+  }
+  audioElement.volume = volume; // Define o volume (pode ser ajustado se os sons estiverem muito altos)
+  audioElement.currentTime = 0; // Garante que o som sempre comece do início
+  return audioElement.play().catch(error => {
+    // Este bloco catch lida com rejeições de Promise de audioElement.play()
+    // Causas comuns: o navegador exige um gesto do usuário, políticas de autoplay, etc.
+    console.error(`Error playing audio ${audioElement.src}:`, error);
+    // Opcionalmente, você pode adicionar lógica de fallback aqui, como um feedback visual.
+  });
  }
 
  // Função para alternar modos
@@ -180,7 +200,7 @@
   if (estado === 'parado') {
     // Troca Configuração por Propaganda com animação
     configSection.style.display = 'none';
-    propagandaSection.style.display = 'block';
+    propagandaSection.style.display = 'flex'; // Alterado para flex para centralizar imagens
     propagandaSection.classList.remove('animar-saida');
     propagandaSection.classList.add('animar-entrada');
 
@@ -222,11 +242,11 @@
     tempoTotalTreinoInicial = treinoTempoRestante;
 
     await requestWakeLock(); // Impede a tela de apagar
-    somInicioGlobal.play(); // Toca o som único de início
-    somInicioGlobal.onended = function() {
+    playSafe(somInicioGlobal); // Toca o som único de início de forma segura
+    somInicioGlobal.onended = async function() { // Adicionado async aqui para permitir await dentro
       if (estado === 'rodando') {
-        if (modoAtual === 'fight') somInicioTreinoFight.play(); else somInicioTreinoHit.play();
-        // Inicia o loop do temporizador apenas após o som global terminar
+        // Usamos playSafe aqui para garantir que os sons de início de treino/round sejam robustos
+        if (modoAtual === 'fight') await playSafe(somInicioTreinoFight); else await playSafe(somInicioTreinoHit);
         intervalo = setInterval(tick, 1000);
         tick(); // Chama o tick imediatamente para atualizar a UI sem delay de 1s
       }
@@ -256,18 +276,19 @@
       
       // Condição para o som de alerta
       if (treinoTempoRestante === 11 && tempoTotalTreinoInicial > 15) {
+        // Usando playSafe para os alertas
         if (modoAtual === 'fight') {
-          somAlertaFight.play().catch(e => console.log('Erro ao tocar som de alerta:', e));
+          playSafe(somAlertaFight);
         } else { // modoAtual === 'hit'
-          somAlertaHit.play().catch(e => console.log('Erro ao tocar som de alerta:', e));
+          playSafe(somAlertaHit);
         }
       }
       treinoTempoRestante--;
     } else {
       if (modoAtual === 'fight') {
-        somFimTreinoFight.play();
+        playSafe(somFimTreinoFight);
       } else {
-        somFimTreinoHit.play();
+        playSafe(somFimTreinoHit);
       }
 
       if (repeticoesRestantes === 1) {
@@ -275,11 +296,11 @@
         repeticoesDisplay.textContent = textoRepeticoes + repeticoesRestantes;
         
         // Toca o som final global
-        somFimGlobal.play();
+        playSafe(somFimGlobal);
 
         pararTemporizador();
       } else {
-        if (modoAtual !== 'fight') somInicioDescansoHit.play();
+        if (modoAtual !== 'fight') playSafe(somInicioDescansoHit);
         ciclo = 'descanso';
         // Reseta o display do tempo de treino para o próximo ciclo
         tempoTreinoDisplay.textContent = textoTreino + formatarTempo(parseInt(treinoMinutos.value), parseInt(treinoSegundos.value));
@@ -292,13 +313,15 @@
       tempoDescansoDisplay.textContent = textoDescanso + formatarTempo(minutos, segundos);
       descansoTempoRestante--;
     } else {
-      if (modoAtual !== 'fight') somFimDescansoHit.play();
+      // Usamos playSafe para o som de fim de descanso
+      if (modoAtual !== 'fight') playSafe(somFimDescansoHit);
       repeticoesRestantes--;
       if (repeticoesRestantes > 0) {
+        // Usamos playSafe para o som de início do próximo treino/round
         if (modoAtual === 'fight') {
-          somInicioTreinoFight.play();
+          playSafe(somInicioTreinoFight);
         } else {
-          somInicioTreinoHit.play();
+          playSafe(somInicioTreinoHit);
         }
         ciclo = 'treino';
         treinoTempoRestante = parseInt(treinoMinutos.value) * 60 + parseInt(treinoSegundos.value);
@@ -307,7 +330,8 @@
         tempoDescansoDisplay.textContent = textoDescanso + formatarTempo(parseInt(descansoMinutos.value), parseInt(descansoSegundos.value));
       } else {
         // Caso de segurança para fim do processo (embora geralmente acabe no treino)
-        somFimGlobal1.play();
+        // Corrigido: somFimGlobal1 para somFimGlobal e usando playSafe
+        playSafe(somFimGlobal);
         pararTemporizador();
       }
     }

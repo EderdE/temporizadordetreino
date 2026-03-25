@@ -175,14 +175,23 @@
  #propaganda {
   display: none; /* Oculto inicialmente */
   width: 290px;
+  height: 185px; /* Altura fixa para igualar visualmente ao config-container */
   margin: 0 auto 20px auto;
   overflow: hidden; /* Garante que a animação de cima para baixo fique contida */
+  background: var(--cor-config-fundo);
+  border: 1px solid var(--cor-primaria-borda);
+  border-radius: 15px;
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1), 1px 1px 3px rgba(255,255,255,0.8);
+  /* Centralização da imagem */
+  align-items: center;
+  justify-content: center;
  }
 
  #propaganda img {
-  width: 100%;
-  border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  max-width: 95%; /* Pequena margem interna para não encostar na borda */
+  max-height: 95%;
+  object-fit: contain; /* Mantém a proporção da imagem sem cortar */
+  border-radius: 10px;
  }
 
  /* Animações de entrada e saída */
@@ -253,6 +262,11 @@
   height: 55px;
   margin: 0 10px;
   border-radius: 12px;
+  border: 1px solid var(--cor-borda-escura);
+  background: var(--cor-botao-gradiente);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  padding: 5px;
+  object-fit: contain;
  }
 
  /* Estilos para os tempos em destaque */
